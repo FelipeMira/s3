@@ -7,13 +7,13 @@ variable "aws_region" {
 variable "aws_access_key" {
   description = "AWS access key (for LocalStack)"
   type        = string
-  default     = "test"
+  default     = "teste"
 }
 
 variable "aws_secret_key" {
   description = "AWS secret key (for LocalStack)"
   type        = string
-  default     = "test"
+  default     = "teste"
 }
 
 variable "localstack_endpoint" {
