@@ -16,7 +16,33 @@ LOCALSTACK_HOST=${LOCALSTACK_HOST:-localhost}
 LOCALSTACK_PORT=${LOCALSTACK_PORT:-4566}
 
 echo "Checking LocalStack at http://$LOCALSTACK_HOST:$LOCALSTACK_PORT..."
-if ! nc -z "$LOCALSTACK_HOST" "$LOCALSTACK_PORT" >/dev/null 2>&1; then
+check_localstack() {
+  host="$1"
+  port="$2"
+
+  # Try nc (netcat) if available
+  if command -v nc >/dev/null 2>&1; then
+    if nc -z "$host" "$port" >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  # Fallback to curl (checks HTTP health endpoint)
+  if command -v curl >/dev/null 2>&1; then
+    # Try LocalStack health endpoint first
+    if curl -sS --fail "http://$host:$port/health" >/dev/null 2>&1; then
+      return 0
+    fi
+    # Then try root URL
+    if curl -sS --fail "http://$host:$port/" >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+if ! check_localstack "$LOCALSTACK_HOST" "$LOCALSTACK_PORT"; then
   echo "LocalStack not reachable at $LOCALSTACK_HOST:$LOCALSTACK_PORT. Start LocalStack before running this script." >&2
   exit 1
 fi
