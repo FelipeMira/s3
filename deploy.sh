@@ -67,7 +67,7 @@ cat > terraform.tfvars <<EOF
 bucket_name = "$BUCKET_NAME"
 EOF
 
-terraform init -input=false
+terraform init -input=false -upgrade
 terraform apply -auto-approve
 
 echo "Done. Outputs:"
